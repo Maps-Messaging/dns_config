@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CloudflareDnsServerApi implements DnsServerApi {
-  private static final String CLOUDFLARE_API_TOKEN = "_m4vYrFKlzEo12pcxwSw3djsOXXzZQhf9ZgYIs-9";//System.getenv("CLOUDFLARE_API_TOKEN");
-  private static final String ZONE_ID = "bcc82d83b12261a6551d0b0c88268269";
+  private static final String CLOUDFLARE_API_TOKEN = getEnv("CLOUDFLARE_API_TOKEN");
+  private static final String ZONE_ID = getEnv("CLOUDFLARE_ZONE_ID");
   private static final String API_BASE = "https://api.cloudflare.com/client/v4/zones/" + ZONE_ID + "/dns_records";
   private static final Gson GSON = new Gson();
 
@@ -86,6 +86,14 @@ public class CloudflareDnsServerApi implements DnsServerApi {
     if (responseCode != 200) {
       throw new RuntimeException("Failed to delete record: HTTP " + responseCode);
     }
+  }
+
+  private static String getEnv(String key){
+    String val = System.getenv(key);
+    if(val == null){
+      val = System.getProperty(key);
+    }
+    return val;
   }
 
 }
