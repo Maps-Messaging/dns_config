@@ -4,7 +4,7 @@ import os
 import requests
 
 CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN", "YOUR_API_TOKEN")
-ZONE_ID = "YOUR_ZONE_ID"
+ZONE_ID = os.getenv("CLOUDFLARE_ZONE_ID")
 CSV_PATH = "dns.csv"
 
 API_BASE = f"https://api.cloudflare.com/client/v4/zones/{ZONE_ID}/dns_records"
