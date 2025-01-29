@@ -105,7 +105,6 @@ public class CloudflareDnsServerApi implements DnsServerApi {
     if(val == null){
       val = System.getProperty(key);
     }
-    System.err.println("Loaed: "+key+": <"+val+"> Length:"+val.length() );
     return val;
   }
 
