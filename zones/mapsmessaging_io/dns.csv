@@ -16,4 +16,3 @@ _amazonses,6 Hours,TXT,g+rO/7q2arYv7A2R74gGU/8X9f4x/xsAMFKdlw7SscQ=,
 _dmarc,6 Hours,TXT,v=DMARC1;p=quarantine;pct=100;fo=1,
 _github-pages-challenge-Maps-Messaging,6 Hours,TXT,b7635a6edea83bebf4d9203fe9461e,
 mail,6 Hours, TXT,"v=spf1 include:amazonses.com ~all",
-webmail, 6 Hours, CNAME, mapsmessaging.awsapps.com
