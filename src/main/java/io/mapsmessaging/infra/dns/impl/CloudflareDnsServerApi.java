@@ -6,6 +6,9 @@ import com.google.gson.JsonObject;
 import io.mapsmessaging.infra.dns.DnsRecord;
 import io.mapsmessaging.infra.dns.DnsServerApi;
 import com.google.gson.*;
+import io.mapsmessaging.infra.dns.logging.DnsInfraLogging;
+import io.mapsmessaging.logging.Logger;
+import io.mapsmessaging.logging.LoggerFactory;
 
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -19,6 +22,8 @@ public class CloudflareDnsServerApi implements DnsServerApi {
   private static final String API_BASE = "https://api.cloudflare.com/client/v4/zones/" + ZONE_ID + "/dns_records";
   private static final Gson GSON = new Gson();
 
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+
   public Map<String, DnsRecord> fetchExistingRecords() throws Exception {
     HttpURLConnection connection = (HttpURLConnection) new URL(API_BASE).openConnection();
     connection.setRequestMethod("GET");
@@ -27,6 +32,7 @@ public class CloudflareDnsServerApi implements DnsServerApi {
 
     int responseCode = connection.getResponseCode();
     if (responseCode != 200) {
+      logger.log(DnsInfraLogging.DNS_REQUEST_FAILED, "Fetch", responseCode, "");
       throw new RuntimeException("Failed to fetch existing records: HTTP " + responseCode);
     }
 
@@ -56,8 +62,10 @@ public class CloudflareDnsServerApi implements DnsServerApi {
 
     int responseCode = connection.getResponseCode();
     if (responseCode != 200) {
+      logger.log(DnsInfraLogging.DNS_REQUEST_FAILED, "Create", responseCode, recordData.toString() );
       throw new RuntimeException("Failed to create record: HTTP " + responseCode);
     }
+    logger.log(DnsInfraLogging.DNS_RECORD_CREATED, recordData);
   }
 
   public void updateRecord(String recordId,  DnsRecord existing, DnsRecord recordData) throws Exception {
@@ -73,8 +81,10 @@ public class CloudflareDnsServerApi implements DnsServerApi {
 
     int responseCode = connection.getResponseCode();
     if (responseCode != 200) {
+      logger.log(DnsInfraLogging.DNS_REQUEST_FAILED, "Update", responseCode, recordData.toString() );
       throw new RuntimeException("Failed to update record: HTTP " + responseCode);
     }
+    logger.log(DnsInfraLogging.DNS_UPDATE_STARTED, existing, recordData);
   }
 
   public void deleteRecord(String recordId) throws Exception {
@@ -84,8 +94,10 @@ public class CloudflareDnsServerApi implements DnsServerApi {
 
     int responseCode = connection.getResponseCode();
     if (responseCode != 200) {
+      logger.log(DnsInfraLogging.DNS_REQUEST_FAILED, "Delete", responseCode, recordId );
       throw new RuntimeException("Failed to delete record: HTTP " + responseCode);
     }
+    logger.log(DnsInfraLogging.DNS_RECORD_DELETED, recordId);
   }
 
   private static String getEnv(String key){

@@ -2,6 +2,9 @@ package io.mapsmessaging.infra.dns;
 
 import io.mapsmessaging.infra.dns.impl.CloudflareDnsServerApi;
 import io.mapsmessaging.infra.dns.impl.CloudflareNoOpDnsManager;
+import io.mapsmessaging.infra.dns.logging.DnsInfraLogging;
+import io.mapsmessaging.logging.Logger;
+import io.mapsmessaging.logging.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -10,16 +13,16 @@ import java.util.*;
 
 public class DnsInfraUpdater {
 
-  private static final String CSV_PATH = "dns.csv";
-
+  private final Logger logger = LoggerFactory.getLogger(getClass());
   private final DnsServerApi dnsServerApi;
   private final Map<String, DnsRecord> existingRecords;
   private final Map<String, DnsRecord> desiredRecords;
 
-  public DnsInfraUpdater(boolean dryRun) throws Exception {
+  public DnsInfraUpdater(String dnsRecordPath, boolean dryRun) throws Exception {
     dnsServerApi = !dryRun? new CloudflareDnsServerApi() : new CloudflareNoOpDnsManager();
+    logger.log(DnsInfraLogging.DNS_UPDATE_STARTED, dnsRecordPath, dryRun);
     existingRecords = dnsServerApi.fetchExistingRecords();
-    desiredRecords = parseCsv();
+    desiredRecords = parseCsv(dnsRecordPath);
   }
 
   public void processRecords() throws Exception {
@@ -46,20 +49,18 @@ public class DnsInfraUpdater {
     for (DnsRecord leftover : existingRecords.values()) {
       dnsServerApi.deleteRecord(leftover.getId());
     }
+    logger.log(DnsInfraLogging.DNS_UPDATE_COMPLETED);
   }
 
-  private Map<String, DnsRecord> parseCsv() throws IOException {
-    Map<String, DnsRecord> desiredRecords = new HashMap<>();
-    List<String> lines = Files.readAllLines(Paths.get(CSV_PATH));
+  private Map<String, DnsRecord> parseCsv(String path) throws IOException {
+    Map<String, DnsRecord> records = new LinkedHashMap<>();
+    List<String> lines = Files.readAllLines(Paths.get(path));
     for (String line : lines) {
       DnsRecord dnsRecord = new DnsRecord(line);
-      desiredRecords.put(dnsRecord.generateKey(), dnsRecord);
+      records.put(dnsRecord.generateKey(), dnsRecord);
     }
-    return desiredRecords;
+    logger.log(DnsInfraLogging.DNS_CSV_PARSED, records.size());
+    return records;
   }
 
-  public static void main(String[] args) throws Exception {
-    DnsInfraUpdater manager = new DnsInfraUpdater(false);
-    manager.processRecords();
-  }
 }
