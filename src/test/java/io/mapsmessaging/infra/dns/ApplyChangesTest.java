@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-class ApplyChanges {
+class ApplyChangesTest {
 
   @Test
   void runUpdates() throws Exception {
