@@ -14,12 +14,7 @@ public class DnsRecord {
   private int ttl;
   private String content;
   private int priority;
-
-  public DnsRecord(int ttl, String content, int priority) {
-    this.ttl = ttl;
-    this.content = content;
-    this.priority = priority;
-  }
+  private boolean proxy;
 
   public DnsRecord(JsonObject json) {
     String zone = json.get("zone_name").getAsString();
@@ -40,6 +35,7 @@ public class DnsRecord {
     else{
       priority = -1;
     }
+    proxy = json.get("proxied").getAsBoolean();
     clean();
   }
 
@@ -63,6 +59,13 @@ public class DnsRecord {
       }
       if(!content.endsWith("\"")){
         content = content + "\"";
+      }
+    }
+    proxy = false;
+    if(parts.length == 5 && !type.equalsIgnoreCase("MX")) {
+      String[] params = parts[4].trim().split(":");
+      if(params.length == 2 && params[0].equalsIgnoreCase("proxy")) {
+        proxy = params[1].equalsIgnoreCase("true");
       }
     }
     clean();
@@ -93,7 +96,9 @@ public class DnsRecord {
     recordData.addProperty("name", domain);
     recordData.addProperty("type", type.toUpperCase());
     recordData.addProperty("ttl", ttl);
-
+    if(proxy){
+      recordData.addProperty("proxied", proxy);
+    }
     if (type.equalsIgnoreCase("MX")) {
       recordData.addProperty("priority", priority);
     }
