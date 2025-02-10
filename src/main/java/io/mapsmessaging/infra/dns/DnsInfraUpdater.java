@@ -21,8 +21,8 @@ public class DnsInfraUpdater {
   public DnsInfraUpdater(String dnsRecordPath, boolean dryRun) throws Exception {
     dnsServerApi = !dryRun? new CloudflareDnsServerApi() : new CloudflareNoOpDnsManager();
     logger.log(DnsInfraLogging.DNS_UPDATE_STARTED, dnsRecordPath, dryRun);
-    existingRecords = dnsServerApi.fetchExistingRecords();
     desiredRecords = parseCsv(dnsRecordPath);
+    existingRecords = dnsServerApi.fetchExistingRecords();
   }
 
   public void processRecords() throws Exception {
@@ -56,6 +56,8 @@ public class DnsInfraUpdater {
     Map<String, DnsRecord> records = new LinkedHashMap<>();
     List<String> lines = Files.readAllLines(Paths.get(path));
     for (String line : lines) {
+      line = line.trim();
+      if(line.isEmpty()) continue;
       DnsRecord dnsRecord = new DnsRecord(line);
       records.put(dnsRecord.generateKey(), dnsRecord);
     }

@@ -20,3 +20,4 @@ mapsmessaging.io,6 Hours,TXT,v=spf1 include:amazonses.com include:_spf.mlsend.co
 litesrv._domainkey,1 Hour,CNAME,litesrv._domainkey.mlsend.com.
 mapsmessaging.io, 1 Hour, TXT, mailerlite-domain-verification=7a04edbe80c286a8f4a876afc1a8ccfce1731cb4
 
+
