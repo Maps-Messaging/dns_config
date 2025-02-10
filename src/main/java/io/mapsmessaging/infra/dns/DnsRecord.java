@@ -17,7 +17,10 @@ public class DnsRecord {
   private boolean proxy;
 
   public DnsRecord(JsonObject json) {
-    String zone = json.get("zone_name").getAsString();
+    String zone="mapsmessaging.io";
+    if(json.has("zone_name")) {
+      zone = json.get("zone_name").getAsString();
+    }
     this.id = json.get("id").getAsString();
     this.domain = json.get("name").getAsString();
     if(domain.length() > zone.length() && domain.endsWith(zone)){
