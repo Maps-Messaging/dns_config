@@ -12,7 +12,7 @@ class ApplyChangesTest {
     if(file.exists()) {
       System.err.println(file.getAbsolutePath());
     }
-    DnsInfraUpdater update = new DnsInfraUpdater(file.getAbsolutePath(),false);
+    DnsInfraUpdater update = new DnsInfraUpdater(file.getAbsolutePath(),true);
     update.processRecords();
   }
 }

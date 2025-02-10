@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CloudflareDnsServerApi implements DnsServerApi {
-  private static final String CLOUDFLARE_API_TOKEN = getEnv("CLOUDFLARE_API_TOKEN");
-  private static final String ZONE_ID = getEnv("CLOUDFLARE_ZONE_ID");
+  private static final String CLOUDFLARE_API_TOKEN = getEnv("CLOUDFLARE_API_TOKEN", "");
+  private static final String ZONE_ID = getEnv("CLOUDFLARE_ZONE_ID", "");
   private static final String API_BASE = "https://api.cloudflare.com/client/v4/zones/" + ZONE_ID + "/dns_records";
   private static final Gson GSON = new Gson();
 
@@ -100,11 +100,12 @@ public class CloudflareDnsServerApi implements DnsServerApi {
     logger.log(DnsInfraLogging.DNS_RECORD_DELETED, recordId);
   }
 
-  private static String getEnv(String key){
+  private static String getEnv(String key, String defaultValue) {
     String val = System.getenv(key);
     if(val == null){
       val = System.getProperty(key);
     }
+    if(val == null){ return defaultValue; }
     return val;
   }
 
